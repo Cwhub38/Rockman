@@ -1,13 +1,10 @@
 extends KinematicBody2D
 class_name Player
 
-
+signal died
 var hud
-signal spawn_lasera(location)
-signal spawn_laser(location)
 onready var muzzle = $Muzzle 
-const Player_Laser = preload("res://PlayerLaser.tscn")
-const Player_Lasera = preload("res://PlayerLasera.tscn")
+var Player_Laser = preload("res://Player_Laser.tscn")
 var SPEED = 210
 var velocity = Vector2(0,0)
 var input_vector = Vector2.ZERO
@@ -17,8 +14,26 @@ var state = States.AIR
 const RUNSPEED = 400
 const JUMPFORCE = -900
 const GRAVITY = 35
+var hp = 3
+
+func ready():
+	loadhearts()
+
+func loadhearts():
+	$Heartsfull.rect_size.x = hp * 53
 
 func _physics_process(delta):
+	if Input.is_action_just_pressed("shootfromtheleft"):
+		$AnimationPlayer.play("shootfromtheleft")
+	if Input.is_action_just_pressed("shootfromtheright"):
+		$AnimationPlayer.play("shootfromright")
+	if Input.is_action_just_pressed("shootup"):
+		$AnimationPlayer.play("shootup")
+	if Input.is_action_just_pressed("shootdown"):
+		$AnimationPlayer.play("shootdown")
+	if Input.is_action_just_pressed("crouch"):
+		$AnimationPlayer.play("crouch")
+	
 	match state:
 		States.AIR:
 			if is_on_floor():
@@ -26,22 +41,42 @@ func _physics_process(delta):
 				continue
 			$Sprite.play("air")
 			if Input.is_action_pressed("move_right"):
+				if Input.is_action_just_pressed("shootfromtheright"):
+					shootfromtheright()
+				if Input.is_action_just_pressed('crouch'):
+					crouch()
 				if Input.is_action_pressed("run"):
 					velocity.x = RUNSPEED
 				else:
 					velocity.x = SPEED
 				$Sprite.flip_h = false
 			elif Input.is_action_pressed("move_left"):
+				if Input.is_action_just_pressed("shootfromtheleft"):
+					shootfromtheleft()
 				if Input.is_action_pressed("run"):
-					velocity. x = -RUNSPEED
+					velocity.x = -RUNSPEED
 				else:
 					velocity.x = -SPEED
 				$Sprite.flip_h = true
+			if Input.is_action_pressed("move_up"):
+				if Input.is_action_just_pressed("shootup"):
+					shootup()
+				velocity.y = -SPEED
+				shoot_Laser()
+			if Input.is_action_pressed("move_down"):
+				velocity.y = SPEED
+				shoot_Laser()
 			else:
 				velocity.x = lerp(velocity.x,0,0.2)
 			move_and_fall()
 			if Input.is_action_just_pressed("jump"):
 						velocity.y = JUMPFORCE
+			if Input.is_action_just_pressed("shootfromtheleft"):
+				$AnimationPlayer.play("shootfromleft")
+				shootfromtheleft()
+			if Input.is_action_just_pressed("shootup"):
+				$AnimationPlayer.play("shootup")
+				shootup()
 			
 		States.FLOOR:
 			if not is_on_floor():
@@ -60,10 +95,21 @@ func _physics_process(delta):
 					velocity.x -= SPEED
 				$Sprite.play("walk")
 				$Sprite.flip_h = true
+				if Input.is_action_just_pressed("move_up"):
+					if Input.is_action_just_pressed("shootup"):
+						$AnimationPlayer.play("shootup")
+						shootup()
+					velocity.y = -SPEED
+					shoot_Laser()
+				if Input.is_action_just_pressed("move_down"):
+					if Input.is_action_just_pressed("shootdown"):
+						$AnimationPlayer.play("shootdown")
+						shootdown()
+					velocity.y = SPEED
+					shoot_Laser()
 			else:
 				$Sprite.play("idle")
 				velocity.x = lerp(velocity.x,0,0.2)
-
 	if Input.is_action_just_pressed("jump"):
 		velocity. y = JUMPFORCE
 		state = States.AIR
@@ -71,18 +117,25 @@ func _physics_process(delta):
 	
 		global_position += input_vector * SPEED
 		
-		move_and_slide(velocity, Vector2.UP)
+		move_and_slide(velocity,Vector2.UP)
 		
 	if Input.is_action_just_pressed("shoot"):
 		shoot_Laser()
-	if Input.is_action_just_pressed("Shoota"):
-		shoot_Lasera()
-	if Input.is_action_just_released("move_right"):
-		set_modulate(Color(1,1,1,1))
+
+func take_damage(damage):
+	ouch()
+	hp -= damage
+	hp -= 1
+	if hp <= 1:
+		died()
+		$Gameover.play()
+
+func died():
+	hp == 0
+	loadhearts()
 
 func ouch():
 	set_modulate(Color(1,0.3,0.3,0.3))
-	$Timer.start()
 
 func shoot_Laser():
 	if Input.is_action_just_pressed("shoot"):
@@ -90,16 +143,49 @@ func shoot_Laser():
 		var f = Player_Laser.instance()
 		f.direction = direction
 		get_parent().add_child(f)
-		f.position.y = position. y + -10
-		f.position.x = position. x + 25 * direction 
+		f.position.y = position.y + 10 * direction
+		f.position.x = position.x + 25 * direction
 
-func shoot_Lasera():
-	if Input.is_action_just_pressed("Shoota"):
+func shootfromtheleft():
+		var q = Player_Laser.instance()
 		var direction = 1 if not $Sprite.flip_h else -1
-		var s = Player_Laser.instance()
-		s.direction = direction
-		get_parent().add_child(s)
-		s.position.y = position. y + -23
+		q.direction = direction
+		get_parent().add_child(q)
+		q.position.y = position.y + 10 * direction
+		q.position.x = position.x - 125 * direction
+
+func crouch():
+		var v = Player_Laser.instance()
+		var direction = 0 if not $Sprite.flip_h else -1
+		v.direction = direction
+		get_parent().add_child(v)
+		v.position.y = position.y - 10
+		v.position.x = position.x - 125
+		$AnimationPlayer.play("crouch")
+
+func shootup():
+	var e = Player_Laser.instance()
+	var direction = 0 if not $Sprite.flip_h else -1
+	e.direction = direction
+	get_parent().add_child(e)
+	e.position.y = position.y + -100 
+	e.position.x = position.x - 0 
+
+func shootdown():
+	var c = Player_Laser.instance()
+	var direction = 1 if not $Sprite.flip_h else -1
+	c.direction = direction
+	get_parent().add_child(c)
+	c.position.y = position.y + 100 * direction
+	c.position.x = position.x - 0 * direction
+
+func shootfromtheright():
+	var g = Player_Laser.instance()
+	var direction = 1 if not $Sprite.flip_h else -1
+	g.direction = direction
+	get_parent().add_child(g)
+	g.position.y = position.y + 0 
+	g.position.x = position.x + 125 
 
 func is_on_floor():
 	velocity = move_and_slide(velocity,Vector2.UP)
@@ -113,11 +199,20 @@ func add_coin():
 
 func _on_Timer_timeout():
 	set_modulate(Color(1,1,1,1))
+	if hp <= 0:
+		get_tree().change_scene("res://GameOver.tscn")
 
 func trauma():
 	$AnimationPlayer.play("camshake")
 
+func _on_player_area_entered(area):
+	if area.is_in_group("enemies"):
+		take_damage(0)
+		$AnimationPlayer.play("death")
 
 func _on_player_body_entered(body):
-	trauma()
-	ouch()
+	if body.is_in_group("enemies"):
+		$AnimationPlayer.play("death")
+
+func _on_Gameover_finished():
+	$Timer.start()
