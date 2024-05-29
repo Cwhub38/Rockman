@@ -1,6 +1,7 @@
 extends KinematicBody2D
 class_name Player
 
+signal died
 var direction= 1
 var hud
 signal spawn_bullet
@@ -17,7 +18,13 @@ var state = States.AIR
 const RUNSPEED = 7000
 const JUMPFORCE = -1100
 const GRAVITY = 75
-var hp = 21
+var hp = 2
+
+func ready():
+	loadhearts()
+
+func loadhearts():
+	$Heartsfull.rect_size.x = hp * 53
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot"):
@@ -83,17 +90,19 @@ func fire_fireball():
 	var c = fireball.instance()
 	c.direction = direction
 	get_parent().add_child(c)
-	c.position.y = position.y + 5 * direction
+	c.position.y = position.y + 35 * direction
 	c.position.x = position.x + 5 * direction
 
 func ouch():
 	set_modulate(Color(1,0.3,0.3,0.3))
-	take_damage(1)
+
 
 func take_damage(damage):
+	ouch()
 	hp -= damage
 	hp -= 1
 	if hp <= 1:
+		died()
 		$Gameover.play()
 
 func trauma():
@@ -106,8 +115,25 @@ func move_and_fall():
 	velocity = move_and_slide(velocity,Vector2.UP)
 	velocity.y = velocity.y + GRAVITY
 
-func _on_Gameover_finished():
-	get_tree().change_scene("res://GameOver.tscn")
+func died():
+	hp == 0
+	loadhearts()
+	
+
 
 func _on_PlayerTimer_timeout():
 	set_modulate(Color(1,1,1,1))
+	if hp <= 0:
+		get_tree().change_scene("res://Gameover.tscn")
+
+func _on_player_area_entered(area):
+	if area.is_in_group("enemies"):
+		take_damage(0)
+		$AnimationPlayer.play("death")
+
+func _on_player_body_entered(body):
+	if body.is_in_group("enemies"):
+		$AnimationPlayer.play("death")
+
+func _on_Gameover_finished():
+	$PlayerTimer.start()
