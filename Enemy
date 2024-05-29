@@ -1,51 +1,55 @@
 extends KinematicBody2D
 class_name Enemy
 
-
+signal add_score 
+signal enemy_died
 var hud
-const Bullet = preload("res://Bullet.tscn")
 var input_vector = Vector2.ZERO
 var velocity = Vector2(0,0)
 export (int) var speed = 66
 var color = 0
-var ah = 4
+var ah = 10
 
 func ouch():
 	$AnimationPlayer.play("death")
-	take_damage(1)
+	set_modulate(Color(1,0.3,0.3,0.3))
+
+func take_damage(damage):
+	ouch()
+	$AnimationPlayer.play("death")
+	ah -= damage
+	ah -= 1
+	if ah <= 1:
+		emit_signal("enemy_died")
 
 func _physics_process(delta):
 		global_position.x -= speed * delta
 
-func take_damage(damage):
-	$AnimationPlayer.play("death")
-	ah -= 1
-	$ah.text = str(ah)
-	if ah <= 1:
-		$AnimationPlayer.play("death")
-		queue_free()
-
 func _on_Timer_timeout():
-	take_damage(1)
-
+	set_modulate(Color(1,1,1,1))
+	emit_signal("add_score")
+	$Sprite.play("squashed")
 
 func _on_sides_checker_body_entered(body):
-	if body.is_in_group("Players"):
-		body.ouch()
-		body.take_damage(1)
+	if body.is_in_group("Laser"):
 		$AnimationPlayer.play("death")
-	if body.is_in_group("Players"):
-		body.ouch()
-		body.take_damage(1)
+		take_damage(1)
+		if ah <= 0:
+			emit_signal("add_score")
+	if body.get_collision_layer() == 1:
 		$AnimationPlayer.play("death")
+		ouch()
+		if ah <= 0:
+			enemy_died()
 
 func _on_AnimationPlayer_animation_finished(anim_name):
-		$Timer.start()
+	$Timer.start()
 
+func enemy_died():
+	ah == 0
+	if ah == 0:
+		$Sprite.play("squashed")
 
-
-func _on_top_checker_body_entered(body):
-	if body.is_in_group("Players"):
-		ouch()
-	if body.is_in_group("Laser"):
-		ouch()
+func _on_Sprite_animation_finished():
+	queue_free()
+	emit_signal('add_score')
