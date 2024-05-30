@@ -9,7 +9,6 @@ var speed = 50
 var velocity = Vector2(0,0)
 var score = 0
 
-
 func _physics_process(delta):
 	if ep == 100:
 		$AnimationPlayer.play("moveleft")
@@ -21,6 +20,7 @@ func ouch():
 func take_damage(damage):
 	emit_signal("add_score")
 	$AnimationPlayer.play("death")
+	$Sprite.play("squashed")
 	ep -= damage 
 	ep -= 1
 	if ep <= 0:
@@ -47,7 +47,6 @@ func _on_sides_checker_body_entered(body):
 		if ep <= 0:
 			enemy_died()
 
-
 func _on_Sprite_animation_finished():
 	$AnimationPlayer.play("death")
 
@@ -56,7 +55,6 @@ func enemy_died():
 	if ep == 0:
 		$Sprite.play("squashed")
 		$dieTimer.start()
-
 
 func _on_sides_checker_body_shape_exited(body_rid, body, body_shape_index, local_shape_index):
 	$AnimationPlayer.play("death")
