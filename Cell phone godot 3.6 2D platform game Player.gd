@@ -2,7 +2,7 @@ extends KinematicBody2D
 class_name Player
 
 signal died
-var direction= 1
+var direction = 1
 var hud
 signal spawn_bullet
 signal spawn_fireball
@@ -24,7 +24,7 @@ func ready():
 	loadhearts()
 
 func loadhearts():
-	$Heartsfull.rect_size.x = hp * 53
+	$"../HUD/Heartsfull".rect_size.x = hp * 53
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot"):
@@ -90,12 +90,11 @@ func fire_fireball():
 	var c = fireball.instance()
 	c.direction = direction
 	get_parent().add_child(c)
-	c.position.y = position.y + 35 * direction
+	c.position.y = position.y + 25 * direction
 	c.position.x = position.x + 5 * direction
 
 func ouch():
 	set_modulate(Color(1,0.3,0.3,0.3))
-
 
 func take_damage(damage):
 	ouch()
@@ -118,17 +117,16 @@ func move_and_fall():
 func died():
 	hp == 0
 	loadhearts()
-	
-
 
 func _on_PlayerTimer_timeout():
 	set_modulate(Color(1,1,1,1))
+	$Gameover.play()
 	if hp <= 0:
 		get_tree().change_scene("res://Gameover.tscn")
 
 func _on_player_area_entered(area):
 	if area.is_in_group("enemies"):
-		take_damage(0)
+		take_damage(1)
 		$AnimationPlayer.play("death")
 
 func _on_player_body_entered(body):
