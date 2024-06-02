@@ -20,20 +20,19 @@ func _physics_process(delta):
 
 func _on_bullet_body_entered(body):
 	if is_in_group("enemies"):
-		queue_free()
+		emit_signal("add_score")
 
 
 
 func _on_bullet_area_entered(area):
 	if is_in_group("enemies"):
-		 
-		queue_free()
+		 emit_signal("add_score")
+
 
 
 func _on_bullet_body_exited(body):
-		body.queue_free()
-		queue_free()
+	 emit_signal("add_score")
 
 
 func _on_VisibilityNotifier2D_screen_exited():
-	queue_free()
+	 emit_signal("add_score")
