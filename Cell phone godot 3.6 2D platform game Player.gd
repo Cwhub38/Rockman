@@ -18,7 +18,7 @@ var state = States.AIR
 const RUNSPEED = 7000
 const JUMPFORCE = -1100
 const GRAVITY = 75
-var hp = 10
+var hp = 7
 
 func ready():
 	loadhearts()
