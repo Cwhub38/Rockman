@@ -18,7 +18,7 @@ var state = States.AIR
 const RUNSPEED = 7000
 const JUMPFORCE = -1100
 const GRAVITY = 75
-var hp = 7
+var hp = 10
 
 func ready():
 	loadhearts()
@@ -79,7 +79,6 @@ func _physics_process(delta):
 				if Input.is_action_just_pressed("fire"):
 						fire_fireball()
 
-
 func shoot_bullet():
 	var direction = 1 if not $Sprite.flip_h else -1
 	var f = bullet.instance()
@@ -132,12 +131,10 @@ func _on_PlayerTimer_timeout():
 	if hp <= 0:
 		get_tree().change_scene("res://Gameover.tscn")
 
-
 func _on_Gameover_finished():
 	$PlayerTimer.start()
 	died()
 	set_modulate(Color(3,3,3,3))
-
 
 func _on_AnimationPlayer_animation_finished(anim_name):
 	$PlayTimer.start()
