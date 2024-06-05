@@ -18,7 +18,7 @@ var state = States.AIR
 const RUNSPEED = 7000
 const JUMPFORCE = -1100
 const GRAVITY = 75
-var hp = 3
+var hp = 7
 
 func ready():
 	loadhearts()
@@ -119,17 +119,16 @@ func move_and_fall():
 	velocity.y = velocity.y + GRAVITY
 
 func died():
-	hp == 0
 	loadhearts()
+	hp == 0
 	if hp == 0:
-		died()
 		loadhearts()
+		died()
 	emit_signal("add_score")
 
 func _on_PlayerTimer_timeout():
 	set_modulate(Color(1,1,1,1))
 	emit_signal("died")
-	get_tree().change_scene("res://Gameover.tscn")
 	if hp <= 0:
 		get_tree().change_scene("res://Gameover.tscn")
 
