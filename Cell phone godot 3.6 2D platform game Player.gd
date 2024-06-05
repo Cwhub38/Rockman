@@ -18,13 +18,15 @@ var state = States.AIR
 const RUNSPEED = 7000
 const JUMPFORCE = -1100
 const GRAVITY = 75
-var hp = 2
+var hp = 3
 
 func ready():
 	loadhearts()
+	if hp >= 0:
+		died()
 
 func loadhearts():
-	$"../HUD/Heartsfull".rect_size.x = hp * 53
+	$"../HUD/Heartsfull".rect_size.x = hp % 53
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot"):
@@ -77,13 +79,14 @@ func _physics_process(delta):
 				if Input.is_action_just_pressed("fire"):
 						fire_fireball()
 
+
 func shoot_bullet():
 	var direction = 1 if not $Sprite.flip_h else -1
 	var f = bullet.instance()
 	f.direction = direction
 	get_parent().add_child(f)
-	f.position.y = position.y + 5 * direction
-	f.position.x = position.x + 100 * direction
+	f.position.y = position.y + 25 * direction
+	f.position.x = position.x + 5 * direction
 
 func fire_fireball():
 	var direction = 1 if not $Sprite.flip_h else -1
@@ -91,12 +94,13 @@ func fire_fireball():
 	c.direction = direction
 	get_parent().add_child(c)
 	c.position.y = position.y + 25 * direction
-	c.position.x = position.x + 5 * direction
+	c.position.x = position.x + 100 * direction
 
 func ouch():
 	set_modulate(Color(1,0.3,0.3,0.3))
 
 func take_damage(damage):
+	$explosion.play()
 	ouch()
 	hp -= damage
 	hp -= 1
@@ -117,21 +121,24 @@ func move_and_fall():
 func died():
 	hp == 0
 	loadhearts()
+	if hp == 0:
+		died()
+		loadhearts()
+	emit_signal("add_score")
 
 func _on_PlayerTimer_timeout():
 	set_modulate(Color(1,1,1,1))
-	$Gameover.play()
+	emit_signal("died")
+	get_tree().change_scene("res://Gameover.tscn")
 	if hp <= 0:
 		get_tree().change_scene("res://Gameover.tscn")
 
-func _on_player_area_entered(area):
-	if area.is_in_group("enemies"):
-		take_damage(1)
-		$AnimationPlayer.play("death")
-
-func _on_player_body_entered(body):
-	if body.is_in_group("enemies"):
-		$AnimationPlayer.play("death")
 
 func _on_Gameover_finished():
 	$PlayerTimer.start()
+	died()
+	set_modulate(Color(3,3,3,3))
+
+
+func _on_AnimationPlayer_animation_finished(anim_name):
+	$PlayTimer.start()
