@@ -1,60 +1,63 @@
-extends KinematicBody2D
-class_name Enemy
+extends Area2D
+class_name Enemy2
 
+signal die
 signal add_score
-signal enemy_died
-var ep = 100
 var inout_vector = Vector2.ZERO
-var speed = 50
-var velocity = Vector2(0,0)
+var speed = 1
 var score = 0
+var direction = 1
+var ah = 1
 
 func _physics_process(delta):
-	if ep == 100:
-		$AnimationPlayer.play("moveleft")
+	global_position.x += -speed * direction
 
-func ouch():
-	$Animationplayer.play("death")
-	set_modulate(Color(0.3,0.3,0.3,0.3))
+func _on_Enemy2_area_entered(area):
+	$explode.play()
+	if area.is_in_group("Bullet"):
+		$explode.play()
+		take_damage(1)
+		set_modulate(Color(3,3,3,3))
+		emit_signal("add_score")
+		$Enemy2Timer.start()
+	if area.is_in_group("Player"):
+		set_modulate(Color(3,3,3,3))
+		$Enemy2Timer.start()
+
+func _on_Enemy2_body_entered(body):
+	emit_signal("add_score")
+	if body.is_in_group("Bullet"):
+		$Sprite.play("squashed")
+		take_damage(1)
+		die()
+		emit_signal("add_score")
+	if body.is_in_group("Player"):
+		$Enemy2Timer.start()
+		set_modulate(Color(3,3,3,3))
 
 func take_damage(damage):
-	emit_signal("add_score")
-	$AnimationPlayer.play("death")
-	$Sprite.play("squashed")
-	ep -= damage 
-	ep -= 1
-	if ep <= 0:
-		$AnimationPlayer.play("death")
+	ah -= damage
+	ah -= 1
+	$explode.play()
+	if ah <= 1:
+		die()
 
-func _on_dieTimer_timeout():
-	set_modulate(Color(1,1,1,1))
+func _on_Enemy2Timer_timeout():
+	$explode.play()
+	take_damage(1)
+	queue_free()
 
-func _on_AnimationPlayer_animation_finished(death):
-	$dieTimer.start()
-
-func _on_sides_checker_body_entered(body):
-		$AnimationPlayer.play("moveleft")
-		$AnimationPlayer.play("death")
-		emit_signal("add_score")
-		take_damage(1)
-		$dieTimer.start()
-		if ep <= 0:
-			enemy_died()
-		if body.get_collision_layer() == 1:
-			if body is Bullet:
-				$AnimationPlayer.play("death")
-				body.ouch()
-		if ep <= 0:
-			enemy_died()
+func die():
+	ah == 0
+	$explode.play()
 
 func _on_Sprite_animation_finished():
-	$AnimationPlayer.play("death")
+	queue_free()
+	$Enemy2Timer.start()
 
-func enemy_died():
-	ep == 0
-	if ep == 0:
-		$Sprite.play("squashed")
-		$dieTimer.start()
-
-func _on_sides_checker_body_shape_exited(body_rid, body, body_shape_index, local_shape_index):
-	$AnimationPlayer.play("death")
+func _on_sides_checker_body_entered(body):
+	queue_free()
+	emit_signal("add_score")
+	body.take_damage(1)
+	if body.is_in_group("Bullet"):
+		queue_free()
