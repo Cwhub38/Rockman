@@ -16,13 +16,13 @@ var coins = 0
 enum States {AIR = 1, FLOOR}
 var state = States.AIR
 const RUNSPEED = 7000
-const JUMPFORCE = -1100
+const JUMPFORCE = -900
 const GRAVITY = 75
-var hp = 7
+var hp = 14
 
 func ready():
 	loadhearts()
-	if hp >= 0:
+	if hp <= 0:
 		died()
 
 func loadhearts():
@@ -30,6 +30,7 @@ func loadhearts():
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot"):
+		$Sprite.play("shoot")
 		shoot_bullet()
 	if Input.is_action_just_pressed("fire"):
 		fire_fireball()
@@ -40,6 +41,7 @@ func _physics_process(delta):
 				continue
 				$Sprite.play("air")
 			if Input.is_action_pressed("move_right"):
+				$Sprite.play("move_right")
 				if Input.is_action_pressed("run"):
 					velocity.x = RUNSPEED
 				else:
@@ -55,8 +57,8 @@ func _physics_process(delta):
 			else:
 				velocity.x = lerp(velocity.x,0,0.2)
 				move_and_fall()
-				if Input.is_action_just_pressed("jump"):
-					velocity.y = JUMPFORCE
+			if Input.is_action_just_pressed("jump"):
+					velocity.y = JUMPFORCE 
 		States.FLOOR:
 			if not is_on_floor():
 				state = States.AIR
@@ -71,10 +73,10 @@ func _physics_process(delta):
 				$Sprite.play("idle")
 				velocity.x = lerp(velocity.x,0,0)
 				if Input.is_action_just_pressed("jump"):
-					velocity.y = JUMPFORCE
-					state = States.AIR
-					move_and_fall()
+						velocity.y = JUMPFORCE 
+						move_and_fall()
 				if Input.is_action_just_pressed("shoot"):
+					$Sprite.play("shoot")
 					shoot_bullet()
 				if Input.is_action_just_pressed("fire"):
 						fire_fireball()
@@ -92,7 +94,7 @@ func fire_fireball():
 	var c = fireball.instance()
 	c.direction = direction
 	get_parent().add_child(c)
-	c.position.y = position.y + 25 * direction
+	c.position.y = position.y + -85 * direction
 	c.position.x = position.x + 100 * direction
 
 func ouch():
@@ -138,3 +140,6 @@ func _on_Gameover_finished():
 
 func _on_AnimationPlayer_animation_finished(anim_name):
 	$PlayTimer.start()
+
+func _on_player_area_entered(area):
+	get_tree().change_scene("res://Gameover.tscn")
