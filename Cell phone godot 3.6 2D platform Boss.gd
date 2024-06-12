@@ -3,7 +3,7 @@ class_name boss
 
 signal add_score
 signal enemy_died
-var ep = 4
+var ep = 10
 var inout_vector = Vector2.ZERO
 var speed = 1
 var velocity = Vector2(-1,0)
@@ -24,7 +24,6 @@ func take_damage(damage):
 	if ep <= 0:
 		emit_signal("enemy_died")
 		$AnimationPlayer.play("death")
-		get_tree().change_scene("res://YouWin.tscn")
 
 func ouch():
 	emit_signal("add_score")
@@ -54,7 +53,6 @@ func enemy_died():
 		set_modulate(Color(3,1,1,1))
 		get_tree().change_scene("res://YouWin.tscn")
 		$dieTimer.start()
-		get_tree().change_scene("res://YouWin.tscn")
 
 func _on_Sprite_animation_finished(body):
 	body.queue_free()
@@ -62,27 +60,24 @@ func _on_Sprite_animation_finished(body):
 	if ep <= 0:
 		enemy_died()
 		body.queue_free()
-	queue_free()
-	$dieTimer.start()
+		queue_free()
+		$dieTimer.start()
 
 func _on_dieTimer_timeout():
 	ep -= 1
-	if ep <= 0:
+	if ep <= 1:
 		get_tree().change_scene("res://YouWin.tscn")
 
-
 func _on_AnimationPlayer_animation_finished(death):
-		$dieTimer.start()
-		emit_signal("add_score")
+	$dieTimer.start()
+	emit_signal("add_score")
 
 func _on_sides_checker_area_entered(area):
+	ep -= 1
+	if ep <= 1:
+		enemy_died()
 	$explode.play()
 	emit_signal("add_score")
 	$Sprite.play("squashed")
-	if ep <= 0:
+	if ep <= 1:
 		$dieTimer.start()
-		get_tree().change_scene("res://YouWin.tscn")
-
-
-func _on_explode_finished():
-	get_tree().change_scene("res://YouWin.tscn")
