@@ -11,8 +11,7 @@ var score = 0
 var direction = 1
 
 func _physics_process(delta):
-	global_position.x += -speed * direction
-	
+	$AnimationPlayer.play("move")
 
 func take_damage(damage):
 	$explode.play()
@@ -45,6 +44,7 @@ func _on_sides_checker_body_entered(body):
 		set_modulate(Color(0.3,0.3,0.3,0.3))
 		enemy_died()
 		$AnimationPlayer.play("death")
+		$dieTimer.start()
 
 func enemy_died():
 	ep == 0
@@ -52,9 +52,9 @@ func enemy_died():
 		$AnimationPlayerp.play("death")
 		$Sprite.play("squashed")
 		set_modulate(Color(3,1,1,1))
+		get_tree().change_scene("res://YouWin.tscn")
 		$dieTimer.start()
 		get_tree().change_scene("res://YouWin.tscn")
-		
 
 func _on_Sprite_animation_finished(body):
 	body.queue_free()
@@ -68,15 +68,21 @@ func _on_Sprite_animation_finished(body):
 func _on_dieTimer_timeout():
 	ep -= 1
 	if ep <= 0:
-		enemy_died()
-	get_tree().change_scene("res://YouWin.tscn")
+		get_tree().change_scene("res://YouWin.tscn")
+
 
 func _on_AnimationPlayer_animation_finished(death):
 		$dieTimer.start()
 		emit_signal("add_score")
 
 func _on_sides_checker_area_entered(area):
+	$explode.play()
 	emit_signal("add_score")
 	$Sprite.play("squashed")
 	if ep <= 0:
 		$dieTimer.start()
+		get_tree().change_scene("res://YouWin.tscn")
+
+
+func _on_explode_finished():
+	get_tree().change_scene("res://YouWin.tscn")
