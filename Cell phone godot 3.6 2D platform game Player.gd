@@ -18,7 +18,7 @@ var state = States.AIR
 const RUNSPEED = 7000
 const JUMPFORCE = -900
 const GRAVITY = 75
-var hp = 14
+var hp = 7
 
 func ready():
 	loadhearts()
@@ -122,10 +122,9 @@ func move_and_fall():
 func died():
 	loadhearts()
 	hp == 0
-	if hp == 0:
+	if hp <= 0:
 		loadhearts()
-		died()
-	emit_signal("add_score")
+		get_tree().change_scene("res://Gameover.tscn")
 
 func _on_PlayerTimer_timeout():
 	set_modulate(Color(1,1,1,1))
@@ -133,13 +132,14 @@ func _on_PlayerTimer_timeout():
 	if hp <= 0:
 		get_tree().change_scene("res://Gameover.tscn")
 
+
 func _on_Gameover_finished():
-	$PlayerTimer.start()
-	died()
+	get_tree().change_scene("res://Gameover.tscn")
 	set_modulate(Color(3,3,3,3))
 
 func _on_AnimationPlayer_animation_finished(anim_name):
 	$PlayTimer.start()
 
 func _on_player_area_entered(area):
-	get_tree().change_scene("res://Gameover.tscn")
+	if area.is_in_group("door"):
+		get_tree().change_scene("res://YouWin.tscn")
