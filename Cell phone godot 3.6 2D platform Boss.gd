@@ -56,7 +56,7 @@ func _on_Sprite_animation_finished(body):
 		$dieTimer.start()
 
 func _on_dieTimer_timeout():
-		get_tree().change_scene("res://YouWin.tscn")
+		queue_free()
 
 func _on_AnimationPlayer_animation_finished(death):
 	$dieTimer.start()
@@ -69,3 +69,4 @@ func _on_sides_checker_area_entered(area):
 		$explode.play()
 		emit_signal("add_score")
 		$Sprite.play("squashed")
+		$dieTimer.start()
