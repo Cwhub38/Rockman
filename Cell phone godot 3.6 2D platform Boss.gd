@@ -34,7 +34,6 @@ func ouch():
 
 func _on_sides_checker_body_entered(body):
 	if body.get_collision_layer() == 1:
-		$explode.play()
 		body.take_damage(1)
 		body.loadhearts()
 		emit_signal("died")
@@ -79,5 +78,3 @@ func _on_sides_checker_area_entered(area):
 	$explode.play()
 	emit_signal("add_score")
 	$Sprite.play("squashed")
-	if ep <= 1:
-		$dieTimer.start()
