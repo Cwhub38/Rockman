@@ -19,15 +19,14 @@ func take_damage(damage):
 	$AnimationPlayer.play("death")
 	ep -= damage
 	ep -= 1
-	emit_signal("enemy_died")
 	$AnimationPlayer.play("death")
-	if ep <= 0:
+	if ep <= 1:
 		emit_signal("enemy_died")
 		$AnimationPlayer.play("death")
 
 func ouch():
 	emit_signal("add_score")
-	$AnimationpPlayer.play("death")
+	$AnimationPlayer.play("death")
 	$explode.play()
 	take_damage(1)
 	emit_signal("add_score")
@@ -39,32 +38,24 @@ func _on_sides_checker_body_entered(body):
 		emit_signal("died")
 		emit_signal("add_score")
 		$Sprite.play("squashed")
-		set_modulate(Color(0.3,0.3,0.3,0.3))
-		enemy_died()
-		$AnimationPlayer.play("death")
-		$dieTimer.start()
 
 func enemy_died():
 	ep == 0
-	if ep <= 0:
-		$AnimationPlayerp.play("death")
+	if ep <= 1:
+		$AnimationPlayer.play("death")
 		$Sprite.play("squashed")
 		set_modulate(Color(3,1,1,1))
-		get_tree().change_scene("res://YouWin.tscn")
-		$dieTimer.start()
 
 func _on_Sprite_animation_finished(body):
 	body.queue_free()
 	queue_free()
-	if ep <= 0:
+	if ep <= 1:
 		enemy_died()
 		body.queue_free()
 		queue_free()
 		$dieTimer.start()
 
 func _on_dieTimer_timeout():
-	ep -= 1
-	if ep <= 1:
 		get_tree().change_scene("res://YouWin.tscn")
 
 func _on_AnimationPlayer_animation_finished(death):
@@ -75,6 +66,6 @@ func _on_sides_checker_area_entered(area):
 	ep -= 1
 	if ep <= 1:
 		enemy_died()
-	$explode.play()
-	emit_signal("add_score")
-	$Sprite.play("squashed")
+		$explode.play()
+		emit_signal("add_score")
+		$Sprite.play("squashed")
