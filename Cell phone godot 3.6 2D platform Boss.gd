@@ -4,7 +4,7 @@ class_name boss
 signal add_score
 signal enemy_died
 var ep = 10
-var inout_vector = Vector2.ZERO
+var input_vector = Vector2.ZERO
 var speed = 1
 var velocity = Vector2(-1,0)
 var score = 0
