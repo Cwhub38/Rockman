@@ -11,7 +11,6 @@ func _ready():
 func _physics_process(delta):
 	velocity = move_and_slide(velocity,Vector2.UP)
 	
-	
 	if is_on_wall():
 		emit_signal("add_score")
 		queue_free()
