@@ -27,6 +27,9 @@ func ouch():
 	$explode.play()
 
 func _on_sides_checker_body_entered(body):
+	if body.is_in_group("Bullet"):
+		emit_signal("add_score")
+		take_damage(1)
 	if body.is_in_group("Fireball"):
 		emit_signal("add_score")
 		take_damage(1)
@@ -39,7 +42,6 @@ func _on_sides_checker_body_entered(body):
 		emit_signal("add_score")
 		$Sprite.play("squashed")
 		$dieTimer.start()
-
 
 func enemy_died():
 	ep == 0
