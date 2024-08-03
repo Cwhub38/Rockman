@@ -77,10 +77,11 @@ func _physics_process(_delta):
 						move_and_fall()
 				if Input.is_action_just_pressed("shoot"):
 					$Sprite.play("shoot")
+					$AnimationPlayer.play("camshake")
 					shoot_bullet()
 				if Input.is_action_just_pressed("fire"):
 						fire_fireball()
-				if Input.is_action_just_pressed("fire"):
+				if Input.is_action_just_pressed("shoot"):
 					trauma()
 
 func shoot_bullet():
@@ -143,6 +144,10 @@ func _on_AnimationPlayer_animation_finished(anim_name):
 	$PlayTimer.start()
 
 func _on_player_area_entered(area):
+	if area.is_in_group("fireballtwo"):
+		take_damage(1)
+	if area.is_in_group("enemies"):
+		get_tree().change_scene("res://Gameover.tscn")
 	if area.is_in_group("door"):
 		get_tree().change_scene("res://YouWin.tscn")
 
