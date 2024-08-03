@@ -5,6 +5,9 @@ signal enemy_died
 signal add_score
 var ep = 10
 
+func _physics_process(_delta):
+		$AnimationPlayer.play("move")
+
 func take_damage(damage):
 	ouch()
 	$AnimationPlayer.play("death")
@@ -22,19 +25,22 @@ func ouch():
 	set_modulate(Color(1,0.3,0.3,0.3))
 
 func _on_destroyer_body_entered(body):
-	if body.get_collision_layer() == 1:
-		$AnimationPlayer.play("death")
-		ouch()
-		if ep <= 0:
-			enemy_died()
-	if body.is_in_group("Fireball"):
-		body.take_damage(1)
-		emit_signal("add_score")
-		$Sprite.play("death")
-		$timetodie.start()
 	if body.is_in_group("Bullet"):
 		emit_signal("add_score")
-		queue_free()
+		take_damage(1)
+	if body.is_in_group("Fireball"):
+		emit_signal("add_score")
+		take_damage(1)
+	if ep <= 1:
+		$Sprite.play("explode")
+	if body.get_collision_layer() == 1:
+		get_tree().change_scene("res://GameOver.tscn")
+		body.take_damage(1)
+		body.loadhearts()
+		emit_signal("enemy_died")
+		emit_signal("add_score")
+		$Sprite.play("squashed")
+		$timetodie.start()
 
 func _on_timetodie_timeout():
 	set_modulate(Color(1,1,1,1))
@@ -52,3 +58,7 @@ func enemy_died():
 
 func _on_AnimationPlayer_animation_finished(death):
 	$timetodie.start()
+
+func _on_destroyer_area_entered(area):
+	if area.is_in_group("player"):
+		get_tree().change_scene("res://GameOver.tscn")
