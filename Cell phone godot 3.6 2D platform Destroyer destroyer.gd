@@ -61,4 +61,5 @@ func _on_AnimationPlayer_animation_finished(death):
 
 func _on_destroyer_area_entered(area):
 	if area.is_in_group("player"):
-		get_tree().change_scene("res://GameOver.tscn")
+		take_damage(1)
+		area.loadhearts()
