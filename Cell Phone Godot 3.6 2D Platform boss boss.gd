@@ -11,9 +11,12 @@ var score = 0
 var direction = 1
 
 func _physics_process(_delta):
+	$AnimationPlayer.play("fire")
 	$AnimationPlayer.play("move")
 
 func take_damage(damage):
+	if ep <= 50:
+		$AnimationPlayer.play("fire")
 	emit_signal("add_score")
 	$explode.play()
 	ouch()
@@ -27,10 +30,16 @@ func ouch():
 	$explode.play()
 
 func _on_sides_checker_body_entered(body):
+	if ep <= 50:
+		$AnimationPlayer.play("fire")
 	if body.is_in_group("Bullet"):
+		if ep <= 50:
+			$AnimationPlayer.play("fire")
 		emit_signal("add_score")
 		take_damage(1)
 	if body.is_in_group("Fireball"):
+		if ep <= 45:
+			$AnimationPlayer.play("fire")
 		emit_signal("add_score")
 		take_damage(1)
 	if ep <= 1:
