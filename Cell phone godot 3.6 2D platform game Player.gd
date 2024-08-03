@@ -102,6 +102,7 @@ func fire_fireball():
 
 func ouch():
 	set_modulate(Color(1,0.3,0.3,0.3))
+	$Timer.start()
 
 func take_damage(damage):
 	$explosion.play()
@@ -153,3 +154,7 @@ func _on_player_area_entered(area):
 
 func _on_player_body_entered(body):
 	body.queue_free()
+
+
+func _on_Timer_timeout():
+	set_modulate(Color(3,3,3,3))
