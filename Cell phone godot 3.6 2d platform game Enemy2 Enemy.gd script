@@ -23,6 +23,7 @@ func take_damage(damage):
 		$AnimationPlayer.play("death")
 
 func ouch():
+	$explode.play()
 	emit_signal("add_score")
 	$AnimationPlayer.play("death")
 	$explode.play()
@@ -41,7 +42,6 @@ func _on_sides_checker_body_entered(body):
 		emit_signal("die")
 		emit_signal("add_score")
 		$Sprite.play("squashed")
-		$Enemy2Timer.start()
 	if body.is_in_group("Fireball"):
 		emit_signal("add_score")
 		$Sprite.play("squashed")
