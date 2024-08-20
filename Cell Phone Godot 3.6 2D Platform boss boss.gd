@@ -10,11 +10,16 @@ var velocity = Vector2(-1,0)
 var score = 0
 var direction = 1
 
-func _physics_process(_delta):
-	$AnimationPlayer.play("fire")
+func _ready():
 	$AnimationPlayer.play("move")
 
+func _physics_process(_delta):
+	$AnimationPlayer.play("fire")
+
+
 func take_damage(damage):
+	ouch()
+	$AnimationPlayer.play("move")
 	if ep <= 50:
 		$AnimationPlayer.play("fire")
 	emit_signal("add_score")
@@ -30,6 +35,7 @@ func ouch():
 	$explode.play()
 
 func _on_sides_checker_body_entered(body):
+	$AnimationPlayer.play("move")
 	if ep <= 50:
 		$AnimationPlayer.play("fire")
 	if body.is_in_group("Bullet"):
@@ -50,7 +56,7 @@ func _on_sides_checker_body_entered(body):
 		emit_signal("enemy_died")
 		emit_signal("add_score")
 		$Sprite.play("squashed")
-		$dieTimer.start()
+		$timetodie.start()
 
 func enemy_died():
 	ep == 0
@@ -63,6 +69,3 @@ func _on_Sprite_animation_finished(body):
 
 func _on_dieTimer_timeout():
 	queue_free()
-
-func _on_AnimationPlayer_animation_finished(_death):
-	$dieTimer.start()
