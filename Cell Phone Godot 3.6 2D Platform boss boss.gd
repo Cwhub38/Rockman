@@ -44,7 +44,6 @@ func _on_sides_checker_body_entered(body):
 		$Sprite.play("explode")
 	if body.get_collision_layer() == 1:
 		body.take_damage(1)
-		body.loadhearts()
 		emit_signal("enemy_died")
 		emit_signal("add_score")
 		$Sprite.play("squashed")
