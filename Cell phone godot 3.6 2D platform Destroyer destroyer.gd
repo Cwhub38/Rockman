@@ -36,7 +36,6 @@ func _on_destroyer_body_entered(body):
 	if body.get_collision_layer() == 1:
 		get_tree().change_scene("res://GameOver.tscn")
 		body.take_damage(1)
-		body.loadhearts()
 		emit_signal("enemy_died")
 		emit_signal("add_score")
 		$Sprite.play("squashed")
@@ -46,6 +45,7 @@ func _on_timetodie_timeout():
 	set_modulate(Color(1,1,1,1))
 	emit_signal("add_score")
 	$Sprite.play("death")
+	$AnimationPlayer.play("move")
 
 func _on_Sprite_animation_finished():
 	queue_free()
