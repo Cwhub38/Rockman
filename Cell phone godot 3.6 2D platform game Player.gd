@@ -140,22 +140,18 @@ func _on_Gameover_finished():
 
 	set_modulate(Color(3,3,3,3))
 
-func _on_AnimationPlayer_animation_finished(anim_name):
-	$PlayTimer.start()
+
 
 func _on_player_area_entered(area):
 	if area.is_in_group("destroy"):
-		get_tree().change_scene("res://GameOver.tscn")
+		loadhearts()
 	if area.is_in_group("fireballtwo"):
 		take_damage(1)
 	if area.is_in_group("enemies"):
-		get_tree().change_scene("res://Gameover.tscn")
+		loadhearts()
 	if area.is_in_group("door"):
 		get_tree().change_scene("res://YouWin.tscn")
 
 func _on_player_body_entered(body):
-	if body.is_in_group("player"):
-		get_tree().change_scene("res://Gameover.tscn")
-
-func _on_Timer_timeout():
-	set_modulate(Color(3,3,3,3))
+	if body.is_in_group("enemies"):
+		loadhearts()
