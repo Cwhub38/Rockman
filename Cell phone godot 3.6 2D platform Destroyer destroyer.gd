@@ -34,7 +34,6 @@ func _on_destroyer_body_entered(body):
 	if ep <= 1:
 		$Sprite.play("explode")
 	if body.get_collision_layer() == 1:
-		get_tree().change_scene("res://GameOver.tscn")
 		body.take_damage(1)
 		emit_signal("enemy_died")
 		emit_signal("add_score")
