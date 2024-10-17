@@ -11,12 +11,10 @@ var score = 0
 var direction = 1
 
 func ready():
-	$AnimationPlayer.play("fire")
 	$AnimationPlayer.play("move")
 
 func _physics_process(delta):
 	$AnimationPlayer.play("move")
-
 
 func take_damage(damage):
 	ouch()
@@ -24,6 +22,8 @@ func take_damage(damage):
 	emit_signal("add_score")
 	$explode.play()
 	ouch()
+	$Sprite.play("fire")
+	$AnimationPlayer.play("fire")
 	$AnimationPlayer.play("death")
 	ep -= damage
 	ep -= 1
@@ -47,7 +47,6 @@ func _on_sides_checker_body_entered(body):
 		emit_signal("enemy_died")
 		emit_signal("add_score")
 		$Sprite.play("squashed")
-
 
 func enemy_died():
 	ep == 0
