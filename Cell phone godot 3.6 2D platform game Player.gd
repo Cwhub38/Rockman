@@ -140,8 +140,6 @@ func _on_Gameover_finished():
 
 	set_modulate(Color(3,3,3,3))
 
-
-
 func _on_player_area_entered(area):
 	if area.is_in_group("destroy"):
 		loadhearts()
